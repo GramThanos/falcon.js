@@ -5,6 +5,7 @@ Fast-Fourier Lattice-based Compact Signatures over NTRU (FALCON) in JavaScript.
 FALCON is a NIST Post-Quantum Cryptography Competition round three finalist.
 
 *Based on official [Falcon](https://falcon-sign.info/) implementation as submitted on NIST competition round 3 code.*
+*Compiled with [emscripten](https://emscripten.org/) and methods exposed through custom C wrappers.*
 *Wrapper influenced from [ntru.js](https://github.com/cyph/ntru.js)'s wrapper.*
 
 
