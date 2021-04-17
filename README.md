@@ -8,7 +8,7 @@ FALCON is a NIST Post-Quantum Cryptography Competition round three finalist.
 *Compiled with [emscripten](https://emscripten.org/) and methods exposed through custom C wrappers.*
 *Wrapper influenced from [ntru.js](https://github.com/cyph/ntru.js)'s wrapper.*
 
-
+___
 
 ## Usage
 
@@ -51,6 +51,22 @@ falcon.verify('My message', signature, pair.publicKey, 1024).then((signature) =>
 
 ___
 
+## Build from source
+
+Get FALCON C source:
+```bash
+rm -r ./falcon-impl
+bash ./get.sh
+```
+
+Build falcon.js (requires Emscripten installed):
+```bash
+make clean
+make
+```
+
+___
+
 ### License
 
 This project is under [The MIT license](https://opensource.org/licenses/MIT).
@@ -59,6 +75,7 @@ I do although appreciate attribute.
 Copyright (c) 2017-2021 Grammatopoulos Athanasios-Vasileios
 
 This project make use of the Falcon implementation that is also under an MIT license.
+
 ___
 
 [![GramThanos](https://avatars2.githubusercontent.com/u/14858959?s=42&v=4)](https://github.com/GramThanos)
