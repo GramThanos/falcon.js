@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<!-- Required meta tags -->
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<!-- Bootstrap CSS -->
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+		<style type="text/css">
+			input, select {
+				font-family: monospace;
+			}
+		</style>
+
+		<title>falcon.js</title>
+		<meta name="description" content="FALCON signatures in JavaScript">
+		<meta name="author" content="GramThanos">
+
+		<!-- falcon.js -->
+		<script type="text/javascript" src="falcon.js"></script>
+	</head>
+	<body>
+		<div class="container">
+			<div class="row">
+				<div class="col" style="padding-top: 32px;padding-bottom: 32px;">
+					<h1>Falcon.js</h1>
+					<p><i>Fast-Fourier Lattice-based Compact Signatures over NTRU (FALCON) in your browser.</i></p>
+				</div>
+			</div>
+			<div class="row">
+
+				<!-- Key Pair -->
+				<div class="col-md-6" style="margin-bottom: 16px;">
+					<form>
+						<div class="mb-3">
+							<label for="public-key" class="form-label">Public key</label>
+							<input type="text" class="form-control" id="public-key">
+						</div>
+						<div class="mb-3">
+							<label for="private-key" class="form-label">Private key</label>
+							<input type="text" class="form-control" id="private-key">
+						</div>
+						<div class="row">
+							<div class="col">
+								<label for="nlogn" class="form-label">Size in bits</label>
+								<select id="nlogn" class="form-select">
+									<option value="8" selected="selected">256 bits</option>
+									<option value="9">512 bits</option>
+									<option value="10">1024 bits</option>
+								</select>
+							</div>
+							<div class="col">
+								<button id="generate-key-pair" class="btn btn-sm btn-primary" type="button" style="margin-top: 32px;">Generate Key Pair</button>
+							</div>
+						</div>
+					</form>
+				</div>
+
+				<!-- Signature -->
+				<div class="col-md-6" style="margin-bottom: 16px;">
+					<form>
+						<div class="mb-3">
+							<label for="message" class="form-label">Message</label>
+							<input type="text" class="form-control" id="message" value="This is a test message">
+						</div>
+						<div class="mb-3" style="height: 97px;">
+							<label for="signature" class="form-label">Signature</label>
+							<input type="text" class="form-control" id="signature">
+							<div class="valid-feedback">Valid signature</div>
+							<div class="invalid-feedback">Invalid signature</div>
+						</div>
+						<button id="generate-signature" class="btn btn-sm btn-primary" type="button">Sign message</button>
+						<button id="verify-signature" class="btn btn-sm btn-primary" type="button">Verify signature</button>
+					</form>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col" style="padding-top: 32px;padding-bottom: 32px;">
+					<small>Created with ♥ by Grammatopoulos Athanasios-Vasileios</small>
+				</div>
+			</div>
+		</div>
+
+		<!-- Tools -->
+		<script type="text/javascript">
+			var tools = {
+				// Base64 URL - Uint8Array
+				base64urlToUint8Array : function(base64url) {
+					return this.base64ToUint8Array(this.base64urlToBase64(base64url));
+				},
+				uint8ArrayToBase64url : function(array) {
+					return this.base64ToBase64url(this.uint8ArrayToBase64(array));
+				},
+				
+				// Base64 - Uint8Array
+				base64ToUint8Array : function(base64) {
+					var raw = window.atob(base64);
+					var rawLength = raw.length;
+					var array = new Uint8Array(new ArrayBuffer(rawLength));
+
+					for(var i = 0; i < rawLength; i++) {
+						array[i] = raw.charCodeAt(i);
+					}
+					return array;
+				},
+				uint8ArrayToBase64 : function(array) {
+					var string = String.fromCharCode.apply(null, new Uint8Array(array));
+					return this.stringToBase64(string);
+				},
+
+				// Base64 URL - Base64
+				base64urlToBase64 : function(base64url) {
+					var base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
+					while(base64.length % 4 != 0){
+						base64 += '=';
+					}
+					return base64;
+				},
+				base64ToBase64url : function(base64) {
+					var base64url = base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=*$/, '');
+					return base64url;
+				},
+
+				// Uint8Array - Hex
+				uint8ArrayToHex : function(array) {
+					return Array.from(new Uint8Array(array), function(byte) {
+						return ('0' + (byte & 0xFF).toString(16)).slice(-2);
+					}).join('');
+				},
+				hexToUint8Array : function(hex) {
+					for (var bytes = [], c = 0; c < hex.length; c += 2)
+					bytes.push(parseInt(hex.substr(c, 2), 16));
+					return new Uint8Array(bytes);
+				},
+
+				stringToBase64 : function(string) {
+					return window.btoa(string);
+				}
+			}
+		</script>
+
+		<!-- App logic -->
+		<script type="text/javascript">
+			// Get nlogn
+			var get_n = function() {
+				let v = parseInt(document.getElementById('nlogn').value, 10);
+				v = (!isNaN(v) && v >= 8 && v <= 10) ? v : 8;
+				return Math.pow(2, v);
+			};
+
+			// Generate key pair
+			let generate_key = (function() {
+				let atomic = false;
+				return () => {
+					if (atomic) return;
+					atomic = true;
+
+					let n = get_n();
+					// Generate
+					falcon.keypair(n).then((pair) => {
+						atomic = false;
+						document.getElementById('public-key').value = tools.uint8ArrayToBase64url(pair.publicKey);
+						document.getElementById('private-key').value = tools.uint8ArrayToBase64url(pair.privateKey);
+					}).catch((error) => {
+						atomic = false;
+						console.log('Failed to create keypair', error);
+					});
+				}
+			})();
+
+			// Generate signature
+			let generate_signature = (function() {
+				let atomic = false;
+				return () => {
+					if (atomic) return;
+					atomic = true;
+
+					clear_verification_signature();
+					let message = document.getElementById('message').value;
+					let privateKey = tools.base64urlToUint8Array(document.getElementById('private-key').value);
+					let n = get_n();
+					// Generate
+					falcon.sign(message, privateKey, n).then((signature) => {
+						atomic = false;
+						document.getElementById('signature').value = tools.uint8ArrayToBase64url(signature);
+					}).catch((error) => {
+						atomic = false;
+						console.log('Failed to generate signature', error);
+					});
+				};
+			})();
+
+			// Verify signature
+			let verify_signature = (function() {
+				let atomic = false;
+				return () => {
+					if (atomic) return;
+					atomic = true;
+
+					let message = document.getElementById('message').value;
+					let signature = tools.base64urlToUint8Array(document.getElementById('signature').value);
+					let publicKey = tools.base64urlToUint8Array(document.getElementById('public-key').value);
+					let n = get_n();
+					// Generate
+					falcon.verify(message, signature, publicKey, n).then((signature) => {
+						atomic = false;
+						document.getElementById('signature').classList.remove('is-invalid');
+						document.getElementById('signature').classList.add('is-valid');
+					}).catch((error) => {
+						atomic = false;
+						document.getElementById('signature').classList.remove('is-valid');
+						document.getElementById('signature').classList.add('is-invalid');
+						console.log('Failed to validate signature', error);
+					});
+				};
+			})();
+			let clear_verification_signature = function() {
+				let signature = document.getElementById('signature');
+				signature.classList.remove('is-valid');
+				signature.classList.remove('is-invalid');
+			}
+
+			document.getElementById('generate-key-pair').addEventListener('click', generate_key);
+			document.getElementById('generate-signature').addEventListener('click', generate_signature);
+			document.getElementById('verify-signature').addEventListener('click', verify_signature);
+
+			document.getElementById('public-key').addEventListener('change', clear_verification_signature);
+			document.getElementById('private-key').addEventListener('change', clear_verification_signature);
+			document.getElementById('message').addEventListener('change', clear_verification_signature);
+			document.getElementById('signature').addEventListener('change', clear_verification_signature);
+
+			window.addEventListener('load', generate_key);
+		</script>
+
+		<!-- Bootstrap -->
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
+	</body>
+</html>
