@@ -15,7 +15,7 @@
 #   LIBS     Extra libraries for linking.
 
 CC = emcc
-CFLAGS = -Wall -Wextra -Wshadow -Wundef -O3
+CFLAGS = -Wall -Wextra -Wshadow -Wundef -O3 -DFALCON_RAND_GETENTROPY=0 -DFALCON_RAND_URANDOM=1 -DFALCON_RAND_WIN32=0
 LD = emcc
 LDFLAGS = 
 LIBS = 
@@ -63,7 +63,7 @@ keygen.o: keygen.c config.h inner.h fpr.h
 	$(CC) $(CFLAGS) -c -o $(SOURCE)/keygen.o $(SOURCE)/keygen.c
 
 rng.o: rng.c config.h inner.h fpr.h
-	$(CC) $(CFLAGS) -c -o $(SOURCE)/rng.o $(SOURCE)/rng.c -D FALCON_RAND_GETENTROPY=0 -D FALCON_RAND_URANDOM=1 -D FALCON_RAND_WIN32=0
+	$(CC) $(CFLAGS) -c -o $(SOURCE)/rng.o $(SOURCE)/rng.c
 
 shake.o: shake.c config.h inner.h fpr.h
 	$(CC) $(CFLAGS) -c -o $(SOURCE)/shake.o $(SOURCE)/shake.c
