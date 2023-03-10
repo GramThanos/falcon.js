@@ -31,13 +31,22 @@
 
 	// Initialize module
 	var init = Module.ready.then(function () {
-		Module._falconjs_init();
+		var res = Module._falconjs_init();
+		if (res == 1) {
+			console.error('[falcon.js] Initialisation failed!');
+		}
+		falcon.initialised = res ? false : true;
 	});
 
 	// FALCON methods
 	var falcon = {
 
-		version: 'v0.1-beta',
+		version: 'v0.2-beta',
+		initialised: false,
+
+		isInitialised: function() {
+			return this.initialised ? true : false;
+		},
 
 		keypair: function (n) {
 			return init.then(function () {
