@@ -10,5 +10,5 @@ if [ ! -d $TARGET_DIR ]; then
 	unzip -q $TMP_ZIP_NAME
 	mv $RENAME_SUBFOLDER $TARGET_DIR
 	rm $TMP_ZIP_NAME
-	rm $TMP_FOLDER_NAME
+	rm -R $TMP_FOLDER_NAME
 fi
