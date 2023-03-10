@@ -20,7 +20,7 @@ var falcon = (function () {
 		Module.onAbort = reject;
 		Module.onRuntimeInitialized = function () {
 			try {
-				Module._falconjs_pubkey_size();
+				Module._falconjs_pubkey_size(8);
 				resolve(Module);
 			}
 			catch (err) {
