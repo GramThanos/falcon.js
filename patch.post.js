@@ -1,5 +1,4 @@
 // End of emscripten code
-
 	}).catch(function () {
 		throw new Error('Failed to load');
 	}).then(function (m) {
@@ -25,7 +24,7 @@
 			Module._xfree(buffer);
 		}
 		catch (err) {
-			setTimeout(() => {throw err;}, 0);
+			setTimeout(function () {throw err;}, 0);
 		}
 	}
 
