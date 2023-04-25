@@ -30,13 +30,13 @@ OBJ = $(SOURCE)/codec.o $(SOURCE)/common.o $(SOURCE)/falcon.o $(SOURCE)/fft.o $(
 all: getsource falconjs
 
 clean:
-	-rm -f $(OBJ) falcon.js falconjs.o falcon.wasm
+	-rm -f $(OBJ) falcon.js falconjs.o falcon.wasm falcon.wasm.js
 
 getsource:
 	-bash ./get.sh
 
 falconjs: falconjs.o $(OBJ)
-	$(LD) $(LDFLAGS) -o falcon.js falconjs.o $(OBJ) $(LIBS) -s EXPORTED_FUNCTIONS='["_xfree","_xmalloc","_falconjs_init","_falconjs_pubkey_size","_falconjs_privkey_size","_falconjs_expandedkey_size","_falconjs_sig_compressed_maxsize","_falconjs_sig_ct_size","_falconjs_keygen_make","_falconjs_expand_privkey","_falconjs_sign_dyn","_falconjs_verify"]' -s EXPORTED_RUNTIME_METHODS='["writeArrayToMemory", "FS"]' -sFORCE_FILESYSTEM
+	$(LD) $(LDFLAGS) -o falcon.js falconjs.o $(OBJ) $(LIBS) -s EXPORTED_FUNCTIONS='["_xfree","_xmalloc","_falconjs_init","_falconjs_pubkey_size","_falconjs_privkey_size","_falconjs_expandedkey_size","_falconjs_sig_compressed_maxsize","_falconjs_sig_ct_size","_falconjs_keygen_make","_falconjs_expand_privkey","_falconjs_sign_dyn","_falconjs_verify"]' -s EXPORTED_RUNTIME_METHODS='["writeArrayToMemory", "FS"]' -sFORCE_FILESYSTEM -sWASM=2
 	cat patch.pre.js falcon.js patch.post.js > tmp.js; mv tmp.js falcon.js
 
 # =====================================================================
