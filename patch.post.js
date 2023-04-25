@@ -40,7 +40,7 @@
 	// FALCON methods
 	var falcon = {
 
-		version: 'v0.2-beta',
+		version: 'v0.3-beta',
 		initialised: false,
 
 		isInitialised: function() {
