@@ -43,11 +43,17 @@
 						</div>
 						<div class="row">
 							<div class="col">
-								<label for="nlogn" class="form-label">Size in bits</label>
+								<label for="nlogn" class="form-label">Falcon variant <small>(ring degree <code>n</code>)</small></label>
 								<select id="nlogn" class="form-select">
-									<option value="8" selected="selected">256 bits</option>
-									<option value="9">512 bits</option>
-									<option value="10">1024 bits</option>
+									<option value="2">4 (n=2)</option>
+									<option value="3">8 (n=3)</option>
+									<option value="4">16 (n=4)</option>
+									<option value="5">32 (n=5)</option>
+									<option value="6">64 (n=6)</option>
+									<option value="7">128 (n=7)</option>
+									<option value="8">256 (n=8)</option>
+									<option value="9" selected="selected">Falcon-512 (n=9)</option>
+									<option value="10">Falcon-1024 (n=9)</option>
 								</select>
 							</div>
 							<div class="col">
