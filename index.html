@@ -34,16 +34,16 @@
 				<div class="col-md-6" style="margin-bottom: 16px;">
 					<form>
 						<div class="mb-3">
-							<label for="public-key" class="form-label">Public key</label>
+							<label for="public-key" class="form-label">Public key <small id="public-key-info"></small></label>
 							<input type="text" class="form-control" id="public-key">
 						</div>
 						<div class="mb-3">
-							<label for="private-key" class="form-label">Private key</label>
+							<label for="private-key" class="form-label">Private key <small id="private-key-info"></small></label>
 							<input type="text" class="form-control" id="private-key">
 						</div>
 						<div class="row">
+							<label for="nlogn" class="form-label">Falcon variant <small>(ring degree <code>n</code>)</small></label>
 							<div class="col">
-								<label for="nlogn" class="form-label">Falcon variant <small>(ring degree <code>n</code>)</small></label>
 								<select id="nlogn" class="form-select">
 									<option value="2">4 (n=2)</option>
 									<option value="3">8 (n=3)</option>
@@ -57,7 +57,7 @@
 								</select>
 							</div>
 							<div class="col">
-								<button id="generate-key-pair" class="btn btn-sm btn-primary" type="button" style="margin-top: 32px;">Generate Key Pair</button>
+								<button id="generate-key-pair" class="btn btn-sm btn-primary" type="button">Generate Key Pair</button>
 							</div>
 						</div>
 					</form>
@@ -70,8 +70,8 @@
 							<label for="message" class="form-label">Message</label>
 							<input type="text" class="form-control" id="message" value="This is a test message">
 						</div>
-						<div class="mb-3" style="height: 97px;">
-							<label for="signature" class="form-label">Signature</label>
+						<div class="mb-3" style="height: 100px;">
+							<label for="signature" class="form-label">Signature <small id="signature-info"></small></label>
 							<input type="text" class="form-control" id="signature">
 							<div class="valid-feedback">Valid signature</div>
 							<div class="invalid-feedback">Invalid signature</div>
@@ -167,7 +167,9 @@
 					falcon.keypair(n).then((pair) => {
 						atomic = false;
 						document.getElementById('public-key').value = tools.uint8ArrayToBase64url(pair.publicKey);
+						document.getElementById('public-key-info').textContent = `(${pair.publicKey.byteLength} bytes)`;
 						document.getElementById('private-key').value = tools.uint8ArrayToBase64url(pair.privateKey);
+						document.getElementById('private-key-info').textContent = `(${pair.privateKey.byteLength} bytes)`;
 					}).catch((error) => {
 						atomic = false;
 						console.log('Failed to create keypair', error);
@@ -190,6 +192,7 @@
 					falcon.sign(message, privateKey, n).then((signature) => {
 						atomic = false;
 						document.getElementById('signature').value = tools.uint8ArrayToBase64url(signature);
+						document.getElementById('signature-info').textContent = `(${signature.byteLength} bytes)`;
 					}).catch((error) => {
 						atomic = false;
 						console.log('Failed to generate signature', error);
